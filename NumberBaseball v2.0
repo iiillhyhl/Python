@@ -1,0 +1,58 @@
+import random
+print("=================")
+print(" Number Baseball ")
+print("          v2.0   ")
+print("=================")
+a = [0,0,0]
+i = 0
+b = [0,0,0]
+i = 0
+j = 0
+k = 0
+s = [0,0,0]
+while (k == 0):
+    a[0] = random.randint(0,9)
+    a[1] = random.randint(0,9)
+    while (i == 0):
+        if (a[1] == a[0]):
+            a[1] = random.randint(0,9)
+        else:
+            i += 1
+    a[2] = random.randint(0,9)
+    i = 0
+    while (i == 0):
+        if (a[2] == a[0]):
+            a[2] = random.randint(0,9)
+        elif (a[2] == a[1]):
+            a[2] = random.randint(0,9)
+        else:
+            i += 1
+    j = 0
+    t = 1
+    while (j == 0):
+        print("=== Turn",t,"===")
+        b[0],b[1],b[2] = input("3 numbers:").split(" ")
+        b[0] = int(b[0])
+        b[1] = int(b[1])
+        b[2] = int(b[2])
+        i = 0
+        while (i<3):
+            if (b[i]==a[i]):
+                s[0] += 1
+            elif (b[i] in a):
+                s[1] += 1
+            else:
+                s[2] += 1
+            i+=1
+        print("strikes : ",s[0],"/ balls : ",s[1],"/ outs : ",s[2])
+        if (s[0] == 3):
+            print("=== You win ===")
+            o = int(input("number(play again = 0, quit = 1) : "))
+            if(o == 0):
+                j += 1
+            if(o == 1):
+                j += 1
+                k += 1
+        t += 1
+        s = [0,0,0]
+print("exitting program..")
