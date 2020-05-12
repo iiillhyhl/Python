@@ -1,0 +1,34 @@
+class Dog:
+    def __init__ (self):
+        self.name = 'doge'
+        self.__happy = 50
+        self.age = 1
+
+    def sit(self):
+        if (self.__happy >= 10):
+            print(self.name,'sat.')
+
+    def eat(self):
+            self.__happy+=50;
+            print(self.name,'ate some food and get happier.')
+
+    def show_happy(self):
+        print(self.name,'\'s happy : ',self.__happy)
+        
+    def roll_over(self):
+            if (self.__happy >= 100):
+                print(self.name,'rolled over. It seems to be happy.')
+
+dog1 = Dog()
+i = 0
+while (i == 0):
+    c = input('command : ')
+    if(c == 'sit'):
+        dog1.sit()
+    elif(c == 'eat'):
+        dog1.eat()
+    elif(c == 'happy'):
+        dog1.show_happy()
+    elif(c == 'rollover'):
+        dog1.roll_over()
+
