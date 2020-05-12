@@ -1,0 +1,39 @@
+import random
+import sys
+class Dice:
+    def __init__(self,n):
+        try:
+            if (n <= 3):
+                raise Exception('Dice\'s sides must be much than 3.')
+            else:
+                self.sides = n
+        except Exception as msg:
+            print(msg)
+            sys.exit()
+
+    def roll(self):
+        return random.randint(1,self.sides)
+#making 100 dices using list
+#DiceList = []
+#for  j in range(0,100):
+#    DiceList.append(Dice(6))
+
+Dice1 = Dice(6)
+i = 1
+while (i == 1):
+    print('Player 1 rolls the dice.')
+    a = Dice1.roll()
+    print('Player 2 rolls the dice.')
+    b = Dice1.roll()
+    print('The winner is..')
+    if (a>b):
+        print('Player 1!')
+    elif (a<b):
+        print('Player 2!')
+    else:
+        print('Tied!')
+    print('Player 1 : ',a)
+    print('Player 2 : ',b)
+    n = int(input('type 1 to restart, or type 0 to quit : '))
+    if (n == 0):
+        i += 1
