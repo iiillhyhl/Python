@@ -1,0 +1,31 @@
+import random
+import sys
+class Player:
+    def __init__(self):
+         self.health = 100
+         self.attack = 1
+         self.weaponname = 'sword tier I'
+         self.armorname = 'armor tier I'
+
+    def showstat(self):
+        print('====== Player\'s Stats ======')
+        print('HP : ',self.health)
+        print('Attack Power : ',self.attack)
+
+    def showgear(self):
+        print('====== Player\'s Gears ======')
+        print('Weapon : ',self.weaponname)
+        print('Armor : ',self.armorname)
+n=0
+while (n==0):
+    #Title
+    print('RPG prototype')
+    print('PRESS ENTER TO CONTINUE')
+    input()
+    #Prologue
+    print('Skipped Prologue.')
+    #Idling
+    print('Type command!')
+    print('\'go\' : Explore the world')
+    print('\'stat\' : Show your stats')
+    print('\'gear\' : Show your gears')
