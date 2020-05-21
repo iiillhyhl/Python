@@ -1,0 +1,65 @@
+import pygame
+import sys
+from pygame.locals import QUIT, Rect
+
+pygame.init()
+SURFACE = pygame.display.set_mode((900,500))
+FPSCLOCK = pygame.time.Clock()
+
+class Material:
+    def __init__(self,r,g,b,x,y):
+        #Coordinate : (x : 1~13 , y:1~13)
+        self.color = (r,g,b)
+        self.pos1 = x*30
+        self.pos2 = y*30
+
+class Wall(Material):
+    def __init__(self,x,y):
+        super().__init__(205,133,63,x,y)
+        pygame.draw.rect(SURFACE,self.color,(self.pos1,self.pos2,30,30))
+
+class Player(Material):
+    def __init__(self,x,y):
+        super().__init__(30,144,255,x,y)
+        pygame.draw.circle(SURFACE,self.color,(self.pos1,self.pos2),15)
+
+    def moveup():
+        
+    
+
+class Frame:
+    def __init__(self,v1,v2,v3,v4):
+        color2 = (128,128,128)
+        rec2 = Rect(v1,v2,v3,v4)
+        pygame.draw.rect(SURFACE,color2,rec2)
+
+def main():
+
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        SURFACE.fill((255,255,255))
+
+        frame1 = Frame(0,0,900,30)
+        frame2 = Frame(0,0,30,500)
+        frame3 = Frame(0,420,900,80)
+        frame4 = Frame(420,0,480,500)
+        
+        wall1 = Wall(13,1)
+        wall2 = Wall(13,13)
+        wall3 = Wall(1,1)
+        wall4 = Wall(1,13)
+
+        player1 = Player(5,5)
+
+        
+        pygame.display.update()
+        FPSCLOCK.tick(1)
+
+if __name__ == '__main__':
+    main()
+        
