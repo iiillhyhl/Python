@@ -1,6 +1,6 @@
-import pygame
+mport pygame
 import sys
-from pygame.locals import QUIT, Rect
+from pygame.locals import QUIT, Rect, K_UP, K_DOWN, K_LEFT, K_RIGHT, KEYDOWN
 
 pygame.init()
 SURFACE = pygame.display.set_mode((900,500))
@@ -21,10 +21,19 @@ class Wall(Material):
 class Player(Material):
     def __init__(self,x,y):
         super().__init__(30,144,255,x,y)
-        pygame.draw.circle(SURFACE,self.color,(self.pos1,self.pos2),15)
+       
 
-    def moveup():
-        
+    def moveup(self):
+        self.pos2 = self.pos2 - 30
+    def movedown(self):
+        self.pos2 = self.pos2 + 30
+    def moveleft(self):
+        self.pos1 = self.pos1 - 30
+    def moveright(self):
+        self.pos1 = self.pos1 + 30
+
+    def draw(self):
+         pygame.draw.circle(SURFACE,self.color,(self.pos1 + 15,self.pos2 + 15),15)
     
 
 class Frame:
@@ -35,15 +44,28 @@ class Frame:
 
 def main():
 
-
+    player1 = Player(2,2)
     while True:
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == KEYDOWN:
+                if event.key == K_UP:
+                    player1.moveup()
+                elif event.key == K_DOWN:
+                    player1.movedown()
+                elif event.key == K_LEFT:
+                    player1.moveleft()
+                elif event.key == K_RIGHT:
+                    player1.moveright()
+                elif event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            elif event.type == QUIT:
                 pygame.quit()
                 sys.exit()
 
         SURFACE.fill((255,255,255))
-
+        player1.draw()
+        
         frame1 = Frame(0,0,900,30)
         frame2 = Frame(0,0,30,500)
         frame3 = Frame(0,420,900,80)
@@ -54,12 +76,19 @@ def main():
         wall3 = Wall(1,1)
         wall4 = Wall(1,13)
 
-        player1 = Player(5,5)
-
+        if player1.pos1 > 390:
+            player1.pos1 = 390
+        elif player1.pos1 < 30:
+            player1.pos1 = 30
+        elif player1.pos2 > 390:
+            player1.pos2 = 390
+        elif player1.pos2 < 30:
+            player1.pos2 = 30
         
+        FPSCLOCK.tick(60)
+       
         pygame.display.update()
-        FPSCLOCK.tick(1)
 
 if __name__ == '__main__':
     main()
-        
+
