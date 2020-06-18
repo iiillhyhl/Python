@@ -25,24 +25,27 @@ class Wall():
                 pygame.draw.rect(SURFACE,Wall.color,(pos1,pos2,30,30))       
 
     def collcheck(ma):
+        if Wall.pd == 1:
+            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in Wall.WallCoord:
+                return 1
+            else:
+                return 0
+        if Wall.pd == 2:
+            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in Wall.WallCoord:
+                return 1
+            else:
+                return 0
+        if Wall.pd == 3:
+            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in Wall.WallCoord:
+                return 1
+            else:
+                return 0
+        if Wall.pd == 4:
+            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in Wall.WallCoord:
+                return 1
+            else:
+                return 0
         
-        for i in Wall.WallCoord:
-            if Wall.pd == 1:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos2 = ma.pos2 + 30
-            elif Wall.pd == 2:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos2 = ma.pos2 - 30
-            elif Wall.pd == 3:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos1 = ma.pos1 + 30
-            elif Wall.pd == 4:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos1 = ma.pos1 - 30
 
 class Ball(Material):
     BallCoord = [(6,6),(6,7),(7,8),(8,6)]
@@ -55,53 +58,52 @@ class Ball(Material):
                 pygame.draw.circle(SURFACE,Ball.color,(pos1 + 15,pos2 + 15),15)
                 
     def pushcheck(ma):
-        
+        n = 0
         for i in Ball.BallCoord:
             if Ball.pd == 1:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                    ma.pos2 = ma.pos2 - 30
-                    Wall.collcheck(ma)
-                    if ma.pos2 ==
-            elif Ball.pd == 2:
+                ma.pos2 = ma.pos2 - 30
+                data = ma.pos2
                 if ma.pos1/30 == i[0]:
                     if ma.pos2/30 == i[1]:
                         ma.pos2 = ma.pos2 - 30
-            elif Ball.pd == 3:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos1 = ma.pos1 + 30
-            elif Ball.pd == 4:
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos1 = ma.pos1 - 30
+                        Wall.collcheck(ma)
+                        if ma.pos2 == data:
+                            ma.pos2 = ma.pos2 + 30
+                        elif ma.pos2 == data - 30:
+                            ma.pos2 = ma.pos2 + 30
+                            Ball.BallCoord[n][1] = Ball.BallCoord[n][1] - 30
+                else:
+                    ma.pos2 = ma.pos2 + 30
+                    
+            n += 1
 
 class Player(Material):
     def __init__(self,x,y):
         super().__init__(30,144,255,x,y)        
 
     def moveup(self):
-        self.pos2 = self.pos2 - 30
         Wall.pd = 1
         Ball.pd = 1
-        Wall.collcheck(self)
-        Ball.pushcheck(self) 
+        if Wall.collcheck(self) == 0:
+            self.pos2 -= 30
 
     def movedown(self):
-        self.pos2 = self.pos2 + 30
         Wall.pd = 2
         Ball.pd = 2
-        Wall.collcheck(self)
+        if Wall.collcheck(self) == 0:
+            self.pos2 += 30
+            
     def moveleft(self):
-        self.pos1 = self.pos1 - 30
         Wall.pd = 3
         Ball.pd = 3
-        Wall.collcheck(self)
+        if Wall.collcheck(self) == 0:
+            self.pos1 -= 30
+            
     def moveright(self):
-        self.pos1 = self.pos1 + 30
         Wall.pd = 4
         Ball.pd = 4
-        Wall.collcheck(self)
+        if Wall.collcheck(self) == 0:
+            self.pos1 += 30
 
     def draw(self):
         pygame.draw.circle(SURFACE,self.color,(self.pos1 + 15,self.pos2 + 15),15)
