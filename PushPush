@@ -58,24 +58,78 @@ class Ball(Material):
                 pygame.draw.circle(SURFACE,Ball.color,(pos1 + 15,pos2 + 15),15)
                 
     def pushcheck(ma):
-        n = 0
-        for i in Ball.BallCoord:
-            if Ball.pd == 1:
-                ma.pos2 = ma.pos2 - 30
-                data = ma.pos2
-                if ma.pos1/30 == i[0]:
-                    if ma.pos2/30 == i[1]:
-                        ma.pos2 = ma.pos2 - 30
-                        Wall.collcheck(ma)
-                        if ma.pos2 == data:
-                            ma.pos2 = ma.pos2 + 30
-                        elif ma.pos2 == data - 30:
-                            ma.pos2 = ma.pos2 + 30
-                            Ball.BallCoord[n][1] = Ball.BallCoord[n][1] - 30
+        if Ball.pd == 1:
+            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in Ball.BallCoord:
+                ma.pos2 -= 30
+                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                    ma.pos2 += 30
+                    return 0
+                else: # Player - Ball - Wall
+                    ma.pos2 += 30
+                    return 1
+            else:
+                return 2
+        if Ball.pd == 2:
+            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in Ball.BallCoord:
+                ma.pos2 += 30
+                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                    ma.pos2 -= 30
+                    return 0
+                else: # Player - Ball - Wall
+                    ma.pos2 -= 30
+                    return 1
+            else:
+                return 2
+        if Ball.pd == 3:
+            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in Ball.BallCoord:
+                ma.pos1 -= 30
+                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                    ma.pos1 += 30
+                    return 0
+                else: # Player - Ball - Wall
+                    ma.pos1 += 30
+                    return 1
+            else:
+                return 2
+        if Ball.pd == 4:
+            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in Ball.BallCoord:
+                ma.pos1 += 30
+                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                    ma.pos1 -= 30
+                    return 0
+                else: # Player - Ball - Wall
+                    ma.pos1 -= 30
+                    return 1
+            else:
+                return 2
+
+class House(Material):
+    HouseCoord = [(4,7),(6,4),(7,9),(9,6)]
+    HouseStatus = [0,0,0,0]
+    color1 = (230,230,0)
+    color2 = (255,40,0)
+    pd = 0
+    def start():
+        for x,y in House.HouseCoord:
+            House.statuscheck()
+            data = House.HouseCoord.index((x,y))
+            pos1 = x * 30
+            pos2 = y * 30
+            if House.HouseStatus[data] == 0:
+                pygame.draw.rect(SURFACE,House.color1,(pos1,pos2,30,30))
+            else:
+                pygame.draw.rect(SURFACE,House.color2,(pos1,pos2,30,30))
+                
+    def statuscheck():
+        for x1,y1 in House.HouseCoord:
+            data = House.HouseCoord.index((x1,y1))
+            for x2,y2 in Ball.BallCoord:
+                if (x1,y1) == (x2,y2):
+                    House.HouseStatus[data] = 1
+                    break
                 else:
-                    ma.pos2 = ma.pos2 + 30
-                    
-            n += 1
+                    House.HouseStatus[data] = 0
+            
 
 class Player(Material):
     def __init__(self,x,y):
@@ -84,26 +138,46 @@ class Player(Material):
     def moveup(self):
         Wall.pd = 1
         Ball.pd = 1
-        if Wall.collcheck(self) == 0:
+        if Ball.pushcheck(self) == 0:
+            data = Ball.BallCoord.index((self.pos1 / 30, self.pos2 / 30 - 1))
+            Ball.BallCoord[data] = (int(self.pos1 / 30), int(self.pos2 / 30 - 2))
             self.pos2 -= 30
+        elif Ball.pushcheck(self) == 2:
+            if Wall.collcheck(self) == 0:
+                self.pos2 -= 30
 
     def movedown(self):
         Wall.pd = 2
         Ball.pd = 2
-        if Wall.collcheck(self) == 0:
+        if Ball.pushcheck(self) == 0:
+            data = Ball.BallCoord.index((self.pos1 / 30, self.pos2 / 30 + 1))
+            Ball.BallCoord[data] = (int(self.pos1 / 30), int(self.pos2 / 30 + 2))
             self.pos2 += 30
+        elif Ball.pushcheck(self) == 2:
+            if Wall.collcheck(self) == 0:
+                self.pos2 += 30
             
     def moveleft(self):
         Wall.pd = 3
         Ball.pd = 3
-        if Wall.collcheck(self) == 0:
+        if Ball.pushcheck(self) == 0:
+            data = Ball.BallCoord.index((self.pos1 / 30 - 1, self.pos2 / 30))
+            Ball.BallCoord[data] = (int(self.pos1 / 30 - 2), int(self.pos2 / 30))
             self.pos1 -= 30
+        elif Ball.pushcheck(self) == 2:
+            if Wall.collcheck(self) == 0:
+                self.pos1 -= 30
             
     def moveright(self):
         Wall.pd = 4
         Ball.pd = 4
-        if Wall.collcheck(self) == 0:
+        if Ball.pushcheck(self) == 0:
+            data = Ball.BallCoord.index((self.pos1 / 30 + 1, self.pos2 / 30))
+            Ball.BallCoord[data] = (int(self.pos1 / 30 + 2), int(self.pos2 / 30))
             self.pos1 += 30
+        elif Ball.pushcheck(self) == 2:
+            if Wall.collcheck(self) == 0:
+                self.pos1 += 30
 
     def draw(self):
         pygame.draw.circle(SURFACE,self.color,(self.pos1 + 15,self.pos2 + 15),15)
@@ -114,10 +188,17 @@ class Frame:
         color2 = (128,128,128)
         rec2 = Rect(v1,v2,v3,v4)
         pygame.draw.rect(SURFACE,color2,rec2)
- 
+
+def clear():
+    pygame.draw.rect(SURFACE,(173,255,47),(200,100,500,300))
+    font1 = pygame.font.Font(None,60)
+    font2 = pygame.font.Font(None,30)
+    text1 = font1.render("You Win",True,(255,255,255))
+    text2 = font2.render("Next stage will be released soon.",True,(255,255,255))
+    SURFACE.blit(text1,(350,130))
+    SURFACE.blit(text2,(300,300))
 def main(): 
     player1 = Player(7,7)
-    Wall.start()
     while True:
         for event in pygame.event.get():
             if event.type == KEYDOWN:
@@ -139,6 +220,7 @@ def main():
         SURFACE.fill((255,255,255))
         Wall.start()
         Ball.start()
+        House.start()
         player1.draw()
 
         frame1 = Frame(0,0,900,30)
@@ -154,6 +236,9 @@ def main():
             player1.pos2 = 390
         elif player1.pos2 < 30:
             player1.pos2 = 30
+
+        if House.HouseStatus == [1,1,1,1]:
+            clear()
 
         FPSCLOCK.tick(60)
 
