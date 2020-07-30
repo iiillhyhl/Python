@@ -1,118 +1,149 @@
 import pygame
+#from PushPushClass import Frame
 import sys
 from pygame.locals import QUIT, Rect, K_UP, K_DOWN, K_LEFT, K_RIGHT, KEYDOWN
 
 pygame.init()
 SURFACE = pygame.display.set_mode((900,500))
-FPSCLOCK = pygame.time.Clock() 
+FPSCLOCK = pygame.time.Clock()
 
-class Material:
-    def __init__(self,r,g,b,x,y):
-        #Coordinate : (x : 1~13 , y:1~13)
-        self.color = (r,g,b)
-        self.pos1 = x * 30
-        self.pos2 = y * 30
-
+stage = {1:{'w':[(3,6),(4,6),(5,6),(5,5),(5,4),(5,3),(6,3),(7,3),(7,4),(7,5),(8,5),(9,5),(10,5),(10,6),(10,7),(9,7),(8,7),(8,8),(8,9),(8,10),(7,10),(6,10),(6,9),(6,8),(5,8),(4,8),(3,8),(3,7)],
+            'b':[(6,6),(6,7),(7,8),(8,6)],'h':[(4,7),(6,4),(7,9),(9,6)],
+            'p':(7,7)},
+         2:{'w':[(3,3),(4,3),(5,3),(6,3),(7,3),(7,4),(7,5),(7,6),(7,7),(8,7),(9,7),(9,6),(9,5),(10,5),(11,5),(11,6),(11,7),(11,8),(11,9),(11,10),(10,10),(9,10),(8,10),(8,9),(8,11),(7,11),(6,11),(5,11),(4,11),(4,10),(4,9),(4,8),(5,8),(5,7),(4,7),(3,7),(3,6),(3,5),(3,4)],
+            'b':[(5,5),(5,6),(6,5)],'h':[(10,6),(10,7),(10,8)],
+            'p':(4,4)},
+         3:{'w':[(3,4),(4,4),(5,4),(6,4),(7,4),(8,4),(9,4),(9,5),(10,5),(11,5),(11,6),(11,7),(11,8),(10,8),(10,9),(10,10),(9,10),(8,10),(7,10),(6,10),(6,9),(6,8),(5,10),(4,10),(3,10),(3,9),(2,9),(2,8),(2,7),(2,6),(3,6),(3,5),(5,6),(6,6),(7,6)],
+            'b':[(4,6),(6,7),(9,7),(8,8)],'h':[(4,8),(5,8),(4,9),(5,9)],
+            'p':(4,7)}}
+cs = 1
+clearstatus = 0
+menustatus = 1
 class Wall():
-    WallCoord = [(3,6),(4,6),(5,6),(5,5),(5,4),(5,3),(6,3),(7,3),(7,4),(7,5),(8,5),(9,5),(10,5),(10,6),(10,7),(9,7),(8,7),(8,8),(8,9),(8,10),(7,10),(6,10),(6,9),(6,8),(5,8),(4,8),(3,8),(3,7)]
     pd = 0
     color = (205,133,63)
    
     def start():
-        for x,y in Wall.WallCoord:
+        for x,y in stage[cs]['w']:
                 pos1 = x * 30
                 pos2 = y * 30
                 pygame.draw.rect(SURFACE,Wall.color,(pos1,pos2,30,30))       
 
     def collcheck(ma):
         if Wall.pd == 1:
-            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in Wall.WallCoord:
+            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in stage[cs]['w']:
                 return 1
             else:
                 return 0
         if Wall.pd == 2:
-            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in Wall.WallCoord:
+            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in stage[cs]['w']:
                 return 1
             else:
                 return 0
         if Wall.pd == 3:
-            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in Wall.WallCoord:
+            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in stage[cs]['w']:
                 return 1
             else:
                 return 0
         if Wall.pd == 4:
-            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in Wall.WallCoord:
+            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in stage[cs]['w']:
                 return 1
             else:
                 return 0
         
 
-class Ball(Material):
-    BallCoord = [(6,6),(6,7),(7,8),(8,6)]
+class Ball():
     color = (135,206,235)
     pd = 0
+    bc = 0
+    def reset():
+        Ball.bc = stage[cs]['b'][:]
     def start():
-        for x,y in Ball.BallCoord:
+        for x,y in Ball.bc:
                 pos1 = x * 30
                 pos2 = y * 30
                 pygame.draw.circle(SURFACE,Ball.color,(pos1 + 15,pos2 + 15),15)
                 
     def pushcheck(ma):
         if Ball.pd == 1:
-            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in Ball.BallCoord:
-                ma.pos2 -= 30
-                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
-                    ma.pos2 += 30
-                    return 0
-                else: # Player - Ball - Wall
-                    ma.pos2 += 30
+            if (ma.pos1 / 30, ma.pos2 / 30 - 1) in Ball.bc:
+                if (ma.pos1 / 30, ma.pos2 / 30 - 2) in Ball.bc:
                     return 1
+                else:
+                    ma.pos2 -= 30
+                    if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                        ma.pos2 += 30
+                        return 0
+                    else: # Player - Ball - Wall
+                        ma.pos2 += 30
+                        return 1
             else:
                 return 2
         if Ball.pd == 2:
-            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in Ball.BallCoord:
-                ma.pos2 += 30
-                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
-                    ma.pos2 -= 30
-                    return 0
-                else: # Player - Ball - Wall
-                    ma.pos2 -= 30
+            if (ma.pos1 / 30, ma.pos2 / 30 + 1) in Ball.bc:
+                if (ma.pos1 / 30, ma.pos2 / 30 + 2) in Ball.bc:
                     return 1
+                else:
+                    ma.pos2 += 30
+                    if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                        ma.pos2 -= 30
+                        return 0
+                    else: # Player - Ball - Wall
+                        ma.pos2 -= 30
+                        return 1
             else:
                 return 2
         if Ball.pd == 3:
-            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in Ball.BallCoord:
-                ma.pos1 -= 30
-                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
-                    ma.pos1 += 30
-                    return 0
-                else: # Player - Ball - Wall
-                    ma.pos1 += 30
+            if (ma.pos1 / 30 - 1, ma.pos2 / 30) in Ball.bc:
+                if (ma.pos1 / 30 - 2, ma.pos2 / 30) in Ball.bc:
                     return 1
+                else:
+                    ma.pos1 -= 30
+                    if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                        ma.pos1 += 30
+                        return 0
+                    else: # Player - Ball - Wall
+                        ma.pos1 += 30
+                        return 1
             else:
                 return 2
         if Ball.pd == 4:
-            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in Ball.BallCoord:
-                ma.pos1 += 30
-                if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
-                    ma.pos1 -= 30
-                    return 0
-                else: # Player - Ball - Wall
-                    ma.pos1 -= 30
+            if (ma.pos1 / 30 + 1, ma.pos2 / 30) in Ball.bc:
+                if (ma.pos1 / 30 + 2, ma.pos2 / 30) in Ball.bc:
                     return 1
+                else:
+                    ma.pos1 += 30
+                    if Wall.collcheck(ma) == 0: # Player - Ball - Nothing
+                        ma.pos1 -= 30
+                        return 0
+                    else: # Player - Ball - Wall
+                        ma.pos1 -= 30
+                        return 1
             else:
                 return 2
 
-class House(Material):
-    HouseCoord = [(4,7),(6,4),(7,9),(9,6)]
-    HouseStatus = [0,0,0,0]
+class House():
+    HouseStatus = [0,0,0,0] 
     color1 = (230,230,0)
     color2 = (255,40,0)
     pd = 0
+    def reset():
+        i = 0
+        j = 0
+        if len(House.HouseStatus) < len(stage[cs]['h']):        # 4 < 3 (X)
+            data1 = len(stage[cs]['h']) - len(House.HouseStatus)
+            while (i < data1):
+                House.HouseStatus.append(0)
+                i += 1
+        elif len(House.HouseStatus) > len(stage[cs]['h']):        # 4 > 3
+            data2 = len(House.HouseStatus) - len(stage[cs]['h'])        # data2 = 4 - 3 = 1
+            while (j < data2):     #
+                del House.HouseStatus[0]
+                j += 1
     def start():
-        for x,y in House.HouseCoord:
+        for x,y in stage[cs]['h']:
             House.statuscheck()
-            data = House.HouseCoord.index((x,y))
+            data = stage[cs]['h'].index((x,y))
             pos1 = x * 30
             pos2 = y * 30
             if House.HouseStatus[data] == 0:
@@ -121,9 +152,9 @@ class House(Material):
                 pygame.draw.rect(SURFACE,House.color2,(pos1,pos2,30,30))
                 
     def statuscheck():
-        for x1,y1 in House.HouseCoord:
-            data = House.HouseCoord.index((x1,y1))
-            for x2,y2 in Ball.BallCoord:
+        for x1,y1 in stage[cs]['h']:
+            data = stage[cs]['h'].index((x1,y1)) #data is 0,1,2
+            for x2,y2 in Ball.bc:
                 if (x1,y1) == (x2,y2):
                     House.HouseStatus[data] = 1
                     break
@@ -131,57 +162,58 @@ class House(Material):
                     House.HouseStatus[data] = 0
             
 
-class Player(Material):
-    def __init__(self,x,y):
-        super().__init__(30,144,255,x,y)        
-
-    def moveup(self):
+class Player():
+    pos1 = stage[cs]['p'][0] * 30
+    pos2 = stage[cs]['p'][1] * 30
+    def reset():
+        Player.pos1 = stage[cs]['p'][0] * 30
+        Player.pos2 = stage[cs]['p'][1] * 30
+    def start():
+        color = (30,144,255)
+        pygame.draw.circle(SURFACE, color, (Player.pos1 + 15, Player.pos2 + 15), 15)
+    def moveup():
         Wall.pd = 1
         Ball.pd = 1
-        if Ball.pushcheck(self) == 0:
-            data = Ball.BallCoord.index((self.pos1 / 30, self.pos2 / 30 - 1))
-            Ball.BallCoord[data] = (int(self.pos1 / 30), int(self.pos2 / 30 - 2))
-            self.pos2 -= 30
-        elif Ball.pushcheck(self) == 2:
-            if Wall.collcheck(self) == 0:
-                self.pos2 -= 30
+        if Ball.pushcheck(Player) == 0:
+            data = Ball.bc.index((Player.pos1 / 30, Player.pos2 / 30 - 1))
+            Ball.bc[data] = (int(Player.pos1 / 30), int(Player.pos2 / 30 - 2))
+            Player.pos2 -= 30
+        elif Ball.pushcheck(Player) == 2:
+            if Wall.collcheck(Player) == 0:
+                Player.pos2 -= 30
 
-    def movedown(self):
+    def movedown():
         Wall.pd = 2
         Ball.pd = 2
-        if Ball.pushcheck(self) == 0:
-            data = Ball.BallCoord.index((self.pos1 / 30, self.pos2 / 30 + 1))
-            Ball.BallCoord[data] = (int(self.pos1 / 30), int(self.pos2 / 30 + 2))
-            self.pos2 += 30
-        elif Ball.pushcheck(self) == 2:
-            if Wall.collcheck(self) == 0:
-                self.pos2 += 30
+        if Ball.pushcheck(Player) == 0:
+            data = Ball.bc.index((Player.pos1 / 30, Player.pos2 / 30 + 1))
+            Ball.bc[data] = (int(Player.pos1 / 30), int(Player.pos2 / 30 + 2))
+            Player.pos2 += 30
+        elif Ball.pushcheck(Player) == 2:
+            if Wall.collcheck(Player) == 0:
+                Player.pos2 += 30
             
-    def moveleft(self):
+    def moveleft():
         Wall.pd = 3
         Ball.pd = 3
-        if Ball.pushcheck(self) == 0:
-            data = Ball.BallCoord.index((self.pos1 / 30 - 1, self.pos2 / 30))
-            Ball.BallCoord[data] = (int(self.pos1 / 30 - 2), int(self.pos2 / 30))
-            self.pos1 -= 30
-        elif Ball.pushcheck(self) == 2:
-            if Wall.collcheck(self) == 0:
-                self.pos1 -= 30
+        if Ball.pushcheck(Player) == 0:
+            data = Ball.bc.index((Player.pos1 / 30 - 1, Player.pos2 / 30))
+            Ball.bc[data] = (int(Player.pos1 / 30 - 2), int(Player.pos2 / 30))
+            Player.pos1 -= 30
+        elif Ball.pushcheck(Player) == 2:
+            if Wall.collcheck(Player) == 0:
+                Player.pos1 -= 30
             
-    def moveright(self):
+    def moveright():
         Wall.pd = 4
         Ball.pd = 4
-        if Ball.pushcheck(self) == 0:
-            data = Ball.BallCoord.index((self.pos1 / 30 + 1, self.pos2 / 30))
-            Ball.BallCoord[data] = (int(self.pos1 / 30 + 2), int(self.pos2 / 30))
-            self.pos1 += 30
-        elif Ball.pushcheck(self) == 2:
-            if Wall.collcheck(self) == 0:
-                self.pos1 += 30
-
-    def draw(self):
-        pygame.draw.circle(SURFACE,self.color,(self.pos1 + 15,self.pos2 + 15),15)
-        self.PlayerCoord = (self.pos1/30,self.pos2/30) 
+        if Ball.pushcheck(Player) == 0:
+            data = Ball.bc.index((Player.pos1 / 30 + 1, Player.pos2 / 30))
+            Ball.bc[data] = (int(Player.pos1 / 30 + 2), int(Player.pos2 / 30))
+            Player.pos1 += 30
+        elif Ball.pushcheck(Player) == 2:
+            if Wall.collcheck(Player) == 0:
+                Player.pos1 += 30
 
 class Frame:
     def __init__(self,v1,v2,v3,v4):
@@ -190,58 +222,196 @@ class Frame:
         pygame.draw.rect(SURFACE,color2,rec2)
 
 def clear():
+    global clearstatus
+    clearstatus = 1
+    mouse = pygame.mouse.get_pos()
     pygame.draw.rect(SURFACE,(173,255,47),(200,100,500,300))
     font1 = pygame.font.Font(None,60)
     font2 = pygame.font.Font(None,30)
-    text1 = font1.render("You Win",True,(255,255,255))
-    text2 = font2.render("Next stage will be released soon.",True,(255,255,255))
+    text1 = font1.render("Stage "+str(cs)+" clear!",True,(255,255,255))
     SURFACE.blit(text1,(350,130))
-    SURFACE.blit(text2,(300,300))
-def main(): 
-    player1 = Player(7,7)
+    restartbutton(mouse)
+    if(cs < 3):
+        nextbutton(mouse)
+    menubutton(mouse)
+
+def restartbutton(mouse):
+    click = pygame.mouse.get_pressed()
+    buttonimg1 = pygame.image.load('img1.png')
+    buttonimg2 = pygame.image.load('img2.png')
+    if 410 < mouse[0] < 500 and 280 < mouse[1] < 370:
+        SURFACE.blit(buttonimg2,(410,280))
+        if click[0] == 1:
+            for i in House.HouseStatus:
+                i = 0
+            Player.reset()
+            Ball.reset()
+    else:
+        SURFACE.blit(buttonimg1,(410,280))
+def nextbutton(mouse):
+    global cs
+    global clearstatus
+    click = pygame.mouse.get_pressed()
+    
+    buttonimg1 = pygame.image.load('img3.png')
+    buttonimg2 = pygame.image.load('img4.png')
+    if 570 < mouse[0] < 660 and 280 < mouse[1] < 370:
+        SURFACE.blit(buttonimg2,(570,280))
+        if click[0] == 1:
+            cs += 1
+            clearstatus = 0
+            Player.reset()
+            Ball.reset()
+            House.reset()
+    else:
+        SURFACE.blit(buttonimg1,(570,280))
+def menubutton(mouse):
+    global cs
+    global menustatus
+    click = pygame.mouse.get_pressed()
+    buttonimg1 = pygame.image.load('img5.png')
+    buttonimg2 = pygame.image.load('img6.png')
+    if 250 < mouse[0] < 340 and 280 < mouse[1] < 370:
+        SURFACE.blit(buttonimg2,(250,280))
+        if click[0] == 1:
+            menustatus = 1
+            cs = 0
+    else:
+        SURFACE.blit(buttonimg1,(250,280))
+def menu():
+    mouse = pygame.mouse.get_pos()
+    font1 = pygame.font.Font(None,60)
+    text1 = font1.render("Stages",True,(0,0,0))
+    SURFACE.blit(text1,(100,100))
+    text2 = pygame.image.load("text1.png")
+    SURFACE.blit(text2,(50,400))
+    stage1button(mouse)
+    stage2button(mouse)
+    stage3button(mouse)
+def stage1button(mouse):
+    global cs
+    global menustatus
+    click = pygame.mouse.get_pressed()
+    buttonimg1 = pygame.image.load('menuimg1.png')
+    buttonimg4 = pygame.image.load('menuimg4.png')
+    if 200 < mouse[0] < 315 and 200 < mouse[1] < 310:
+        SURFACE.blit(buttonimg4,(200,200))
+        if click[0] == 1:
+            menustatus = 0
+            cs = 1
+            Player.reset()
+            Ball.reset()
+            House.reset()
+    else:
+        SURFACE.blit(buttonimg1,(200,200))
+def stage2button(mouse):
+    global cs
+    global menustatus
+    click = pygame.mouse.get_pressed()
+    buttonimg2 = pygame.image.load('menuimg2.png')
+    buttonimg5 = pygame.image.load('menuimg5.png')
+    if 400 < mouse[0] < 515 and 200 < mouse[1] < 310:
+        SURFACE.blit(buttonimg5,(400,200))
+        if click[0] == 1:
+            menustatus = 0
+            cs = 2
+            Player.reset()
+            Ball.reset()
+            House.reset()
+    else:
+        SURFACE.blit(buttonimg2,(400,200))
+def stage3button(mouse):
+    global cs
+    global menustatus
+    click = pygame.mouse.get_pressed()
+    buttonimg3 = pygame.image.load('menuimg3.png')
+    buttonimg6 = pygame.image.load('menuimg6.png')
+    if 600 < mouse[0] < 715 and 200 < mouse[1] < 310:
+        SURFACE.blit(buttonimg6,(600,200))
+        if click[0] == 1:
+            menustatus = 0
+            cs = 3
+            Player.reset()
+            Ball.reset()
+            House.reset()
+    else:
+        SURFACE.blit(buttonimg3,(600,200))
+def main():
+    global cs
+    global clearstatus
+    global menustatus
+    Ball.reset()
+    House.reset()
     while True:
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_UP:
-                    player1.moveup()
+                    Player.moveup()
                 elif event.key == K_DOWN:
-                    player1.movedown()
+                    Player.movedown()
                 elif event.key == K_LEFT:
-                    player1.moveleft()
+                    Player.moveleft()
                 elif event.key == K_RIGHT:
-                    player1.moveright()
+                    Player.moveright()
                 elif event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
+                elif event.key == pygame.K_r:
+                    for i in House.HouseStatus:
+                        i = 0
+                        Player.reset()
+                        Ball.reset()
+                elif clearstatus == 1 and cs < 3:
+                    if event.key == pygame.K_n:
+                        cs += 1
+                        clearstatus = 0
+                        Player.reset()
+                        Ball.reset()
+                        House.reset()
+                elif event.key == pygame.K_m:
+                    menustatus = 1
             elif event.type == QUIT:
                 pygame.quit()
                 sys.exit()
 
         SURFACE.fill((255,255,255))
-        Wall.start()
-        Ball.start()
-        House.start()
-        player1.draw()
 
-        frame1 = Frame(0,0,900,30)
-        frame2 = Frame(0,0,30,500)
-        frame3 = Frame(0,420,900,80)
-        frame4 = Frame(420,0,480,500)
+        if menustatus == 1:
+            menu()
+        else:
+            SURFACE.fill((255,255,255))
+            Wall.start()
+            Ball.start()
+            House.start()
+            Player.start()
+            
+            frame1 = Frame(0,0,900,30)
+            frame2 = Frame(0,0,30,500)
+            frame3 = Frame(0,420,900,80)
+            frame4 = Frame(420,0,480,500)  
+            
+            if Player.pos1 > 390:
+                Player.pos1 = 390
+            elif Player.pos1 < 30:
+                Player.pos1 = 30
+            elif Player.pos2 > 390:
+                Player.pos2 = 390
+            elif Player.pos2 < 30:
+                Player.pos2 = 30
+            
+            if sum(House.HouseStatus) == len(House.HouseStatus): 
+                clear()
 
-        if player1.pos1 > 390:
-            player1.pos1 = 390
-        elif player1.pos1 < 30:
-            player1.pos1 = 30
-        elif player1.pos2 > 390:
-            player1.pos2 = 390
-        elif player1.pos2 < 30:
-            player1.pos2 = 30
-
-        if House.HouseStatus == [1,1,1,1]:
-            clear()
-
+        font1 = pygame.font.Font(None,30)
+        text1 = font1.render("Esc : exit",True,(0,0,0))
+        text2 = font1.render("R : retry",True,(0,0,0))
+        text3 = font1.render("M : menu",True,(0,0,0))
+        SURFACE.blit(text1,(800,10))
+        SURFACE.blit(text2,(800,50))
+        SURFACE.blit(text3,(800,90))
+        
         FPSCLOCK.tick(60)
-
+            
         pygame.display.update()
 
 
