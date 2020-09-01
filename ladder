@@ -1,0 +1,95 @@
+import pygame
+import sys
+from tkinter import *
+from random import *
+lineamount = 0
+pygame.init()
+SURFACE = pygame.display.set_mode((1000,500))
+FPSCLOCK = pygame.time.Clock()
+dotdata = {}
+dotdata2 = {}
+def inputbox():
+    window = Tk()
+    window.geometry("400x200+0+0")
+    window.resizable(0,0)
+    def savedata():
+        global lineamount
+        lineamount = int(entry1.get())
+        window.destroy()
+    label1 = Label(window,text = "사다리의 줄 수를 결정해 주세요.", font = "14")
+    label1.pack()
+    entry1 = Entry(window, font = "14")
+    entry1.pack()
+    button1 = Button(window, text = "설정", font = "14", command = savedata)
+    button1.pack()
+    window.mainloop()
+
+class Line:
+    def __init__(self,a):
+        self.linenumber = a
+    def draw(self):
+        #horizontalscreen = (450 - lineamount * 50) ~ (450 + lineamount * 50)
+        if self.linenumber == 1:
+            x = (500 - lineamount * 50) + 50
+        else:
+            x = (500 - lineamount * 50) + 50 + (self.linenumber - 1) * 100
+        linev = pygame.draw.line(SURFACE,(0,0,0),(x,50),(x,450),2)
+        lineh = []
+        if self.linenumber != lineamount:
+            for i in range(len(dotdata[self.linenumber - 1])):
+                lineh.append(pygame.draw.line(SURFACE,(0,0,0),(x,dotdata[self.linenumber - 1][i]),(x+100,dotdata2[self.linenumber - 1][i]),2))
+class Rect:
+    def __init__(self,color,x,y,dx,dy,l):
+        if color == 'gray':
+            c = (192,192,192)
+        pygame.draw.rect(SURFACE,c,(x,y,dx,dy),l)
+def dot():
+    for i in range(lineamount - 1):
+        dotdata[i] = []
+        dotdata2[i] = []
+    datas = []
+    datad = []
+    for i in range(lineamount - 1):
+        data2 = randint(2,4)
+        datas.append(data2)
+        datad.append(data2)
+    for i in range(lineamount - 1):
+        for j in range(datas[i]):
+            data2 = randint(100,300)
+            dotdata[i].append(data2)
+            dotdata[i].sort()
+        for j in range(datad[i]):
+            data2 = randint(100,400)
+            dotdata2[i].append(data2)
+            dotdata2[i].sort()
+        for j in range(datas[i]):
+            dotdata[i][j] += 20*j
+            dotdata2[i][j] += 20*j
+    print(dotdata)
+    print(dotdata2)
+def screen():
+    global lineamount
+    frame1 = Rect('gray',0,0,500-50*lineamount,500,0)
+    frame2 = Rect('gray',1000-(500-50*lineamount),0,500-50*lineamount,500,0)
+def main():
+    inputbox()
+    dot()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        SURFACE.fill((255,255,255))
+        screen()
+        line = []
+        for i in range(lineamount):
+            data = Line(i+1)
+            line.append(data)
+            line[i].draw()
+
+        FPSCLOCK.tick(60)
+        pygame.display.update()
+
+if __name__ == '__main__':
+    main()
