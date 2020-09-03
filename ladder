@@ -55,16 +55,26 @@ def dot():
         datad.append(data2)
     for i in range(lineamount - 1):
         for j in range(datas[i]):
-            data2 = randint(100,300)
+            data2 = randint(100,400)
+            print(data2)
+            print(len(dotdata[i]))
+            if len(dotdata[i]) != 0:
+                m = 0
+                while m == 0:
+                    for k in range(len(dotdata[i])):
+                        print('dotdata ik',dotdata[i][k])
+                        if data2 <= dotdata[i][k] - 10 and data2 >= dotdata[i][k] + 10:
+                            if k == len(dotdata[i]) - 1:
+                                m += 1
+                        else:
+                            break
+                    break
             dotdata[i].append(data2)
-            dotdata[i].sort()
+            print('datas',datas)
         for j in range(datad[i]):
             data2 = randint(100,400)
             dotdata2[i].append(data2)
             dotdata2[i].sort()
-        for j in range(datas[i]):
-            dotdata[i][j] += 20*j
-            dotdata2[i][j] += 20*j
     print(dotdata)
     print(dotdata2)
 def screen():
