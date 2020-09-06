@@ -1,0 +1,18 @@
+T = int(input())
+team = []
+enemy = []
+for i in range(T):
+    team.append([])
+    enemy.append([])
+    team[i] = [0,0,0,0]
+    enemy[i] = [0,0,0,0]
+    team[i][0],team[i][1],team[i][2],team[i][3],enemy[i][0],enemy[i][1],enemy[i][2],enemy[i][3] = map(int,input().split())
+for i in range(T):
+    if sum(team[i]) > sum(enemy[i]) and max(team[i]) > max(enemy[i]):
+        print('R')
+    elif sum(team[i]) > sum(enemy[i]):
+        print('S')
+    elif max(team[i]) > max(enemy[i]):
+        print('I')
+    else:
+        print('R')
