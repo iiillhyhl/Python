@@ -1,0 +1,15 @@
+cursor = 0
+data = list(input())
+for i in data:
+    if i == 'S':
+        cursor += 1
+    else:
+        if ( cursor + 1 )% 4 == 0:
+            cursor += 1
+        elif ( cursor + 2 )% 4 == 0:
+            cursor += 2
+        elif ( cursor + 3 )% 4 == 0:
+            cursor += 3
+        else:
+            cursor += 4
+print (cursor)
