@@ -1,0 +1,35 @@
+T = [[],[],[]]
+for i in range(3):
+    T[i] = input().split(':')
+    for j in range(3):
+        T[i][j] = int(T[i][j])
+N = int(input())
+R = []
+for i in range(N):
+    R.append([])
+    R[i] = input().split(':')
+    for j in range(3):
+        R[i][j] = int(R[i][j])
+time = []
+record = []
+for i in range(3):
+    data = 0
+    data += T[i][0] * 100
+    data += T[i][1]
+    data += T[i][2] * 0.01
+    time.append(data)
+for i in range(N):
+    data = 0
+    data += R[i][0] * 100
+    data += R[i][1]
+    data += R[i][2] * 0.01
+    record.append(data)
+for i in range(N):
+    if record[i] <= time[2]:
+        print('***')
+    elif record[i] <= time[1]:
+        print('**')
+    elif record[i] <= time[0]:
+        print('*')
+    else:
+        print(':(')
